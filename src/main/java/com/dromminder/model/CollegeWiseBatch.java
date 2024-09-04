@@ -27,6 +27,9 @@ public class CollegeWiseBatch {
 
 	@Column(name = "updated_on")
 	private Date updatedOn;
+	
+	@Column
+	private Boolean isActive;
 
 	public Integer getId() {
 		return id;
@@ -71,10 +74,13 @@ public class CollegeWiseBatch {
 	public CollegeWiseBatch() {
 		super();
 	}
-	
-	
-	
-	
-	
+
+	public Boolean getIsActive() {
+		return isActive;
+	}
+
+	public void setIsActive(Boolean isActive) {
+		this.isActive = isActive;
+	}	
 
 }

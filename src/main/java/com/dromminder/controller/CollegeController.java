@@ -36,4 +36,11 @@ public class CollegeController {
 
 	}
 
+	@PostMapping("/update")
+	public ResponseEntity<?> getAllByCollegeId(@RequestBody CollegeWiseBatch collegeWiseBatch) {
+		Response<?> response = collegeWiseBatchService.updateCollegeWiseBatch(collegeWiseBatch);
+		return new ResponseEntity<>(response, HttpStatus.valueOf(response.getResponseCode()));
+
+	}
+
 }

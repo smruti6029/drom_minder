@@ -25,6 +25,8 @@ public class UserDto {
 	private CityDto cityDto;
 	
 	private CollegeDto collegeDto;
+	
+	private CollegeWiseBatchDto batchDto;
 
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date createdOn;
@@ -32,6 +34,8 @@ public class UserDto {
 	@JsonFormat(pattern = "yyyy-MM-dd")
 	private Date updatedOn;
 	private Boolean isActive;
+	
+	private String imageUrl;
 
 	public Long getId() {
 		return id;
@@ -166,6 +170,22 @@ public class UserDto {
 		this.collegeDto = collegeDto;
 	}
 
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public CollegeWiseBatchDto getBatchDto() {
+		return batchDto;
+	}
+
+	public void setBatchDto(CollegeWiseBatchDto batchDto) {
+		this.batchDto = batchDto;
+	}
+
 	public static User convertDtoToEntity(UserDto userDto) {
 		User user = new User();
 		user.setName(userDto.getName());
@@ -203,6 +223,7 @@ public class UserDto {
 		userDto.setRole(user.getRole().name());
 		userDto.setStateDto(StateDto.convertEntityToDTO(user.getState()));
 		userDto.setCityDto(CityDto.convertEntityToDTO(user.getCity()));
+		userDto.setImageUrl(user.getImageUrl());
 
 		return userDto;
 	}

@@ -10,13 +10,11 @@ public interface UserService {
 
 	Response<?> login(LoginRequest loginRequest) throws Exception;
 
-	Response<?> searchByName(String userName);
-
-	Response<?> getById(long userId);
+	Response<?> getById(Long userId);
 
 	Response<?> saveUser(UserDto userDto);
 
-	Response<?> getAllUser(Integer hostelId, String role);
+	Response<?> getAllUser(Integer pageNo, int pageSize, Integer collegeId, String role);
 	
 	
 }

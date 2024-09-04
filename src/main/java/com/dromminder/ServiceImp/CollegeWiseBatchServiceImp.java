@@ -3,6 +3,7 @@ package com.dromminder.ServiceImp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,7 @@ public class CollegeWiseBatchServiceImp implements CollegeWiseBatchService {
 			batch.setCollegeId(collegeWiseBatch.getCollegeId());
 			batch.setUpdatedOn(new Date());
 			batch.setCreatedOn(new Date());
+			batch.setIsActive(true);
 			collegeWiseBatchRepository.save(batch);
 
 			return new Response<>("Save Successfully", null, 200);
@@ -68,6 +70,29 @@ public class CollegeWiseBatchServiceImp implements CollegeWiseBatchService {
 
 			return new Response<>("Something Went wrong ", null, 400);
 
+		}
+	}
+
+	@Override
+	public Response<?> updateCollegeWiseBatch(CollegeWiseBatch collegeWiseBatch) {
+
+		try {
+			if (collegeWiseBatch.getId() == null) {
+				return new Response<>("Batch id required", null, 400);
+			}
+
+			Optional<CollegeWiseBatch> findById = collegeWiseBatchRepository.findById(collegeWiseBatch.getId());
+
+			if (findById.isEmpty()) {
+				return new Response<>("Provide Valid id", null, 400);
+			}
+			findById.get().setIsActive(false);
+
+			collegeWiseBatchRepository.save(findById.get());
+
+			return new Response<>("Status Update Succesfully", null, 400);
+		} catch (Exception e) {
+			return new Response<>("Something Went wrong ", null, 400);
 		}
 	}
 

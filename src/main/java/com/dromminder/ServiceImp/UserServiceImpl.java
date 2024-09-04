@@ -3,10 +3,14 @@ package com.dromminder.ServiceImp;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -14,18 +18,21 @@ import org.springframework.stereotype.Service;
 import com.dromminder.Service.UserService;
 import com.dromminder.Util.Validation;
 import com.dromminder.dto.CollegeDto;
+import com.dromminder.dto.CollegeWiseBatchDto;
 import com.dromminder.dto.LoginRequest;
 import com.dromminder.dto.LoginResponse;
+import com.dromminder.dto.PaginatedResponseDto;
+import com.dromminder.dto.PaginationRequestDto;
 import com.dromminder.dto.Response;
 import com.dromminder.dto.UserDto;
 import com.dromminder.enums.Role;
 import com.dromminder.model.College;
+import com.dromminder.model.CollegeWiseBatch;
 import com.dromminder.model.CredentialMaster;
-import com.dromminder.model.State;
 import com.dromminder.model.User;
 import com.dromminder.repository.CollegeRepository;
+import com.dromminder.repository.CollegeWiseBatchRepository;
 import com.dromminder.repository.CredentialMasterRepository;
-import com.dromminder.repository.StateRepository;
 import com.dromminder.repository.UserRepository;
 import com.dromminder.security.JwtTokenUtil;
 import com.dromminder.security.JwtUserDetailsService;
@@ -47,6 +54,9 @@ public class UserServiceImpl implements UserService {
 
 	@Autowired
 	private CollegeRepository collegeRepository;
+
+	@Autowired
+	private CollegeWiseBatchRepository collegeWiseBatchRepository;
 
 	@Override
 	public Response<?> login(LoginRequest loginRequest) throws Exception {
@@ -121,6 +131,7 @@ public class UserServiceImpl implements UserService {
 				user.setCreatedOn(new Date());
 				user.setUpdatedOn(new Date());
 				user.setIsActive(true);
+				user.setImageUrl(userDto.getImageUrl());
 				User userSave = userRepository.save(user);
 
 				CredentialMaster credentialMaster = new CredentialMaster();
@@ -148,7 +159,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Response<?> getById(long userId) {
+	public Response<?> getById(Long userId) {
 		try {
 			Optional<User> user = userRepository.findById(userId);
 			if (user != null && user.isPresent()) {
@@ -169,26 +180,53 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
-	@Override
-	public Response<?> searchByName(String userName) {
-
-		return null;
-	}
+	
 
 	@Override
-	public Response<?> getAllUser(Integer collegeId, String role) {
+	public Response<?> getAllUser(Integer pageNo, int pageSize, Integer collegeId, String role) {
 
-		List<UserDto> userDtos = new ArrayList<>();
+		try {
+			PaginationRequestDto paginatedRequest = new PaginationRequestDto(pageNo, pageSize, collegeId, role);
 
-		List<User> findByCollegeIdAndRole = userRepository.findByCollegeIdAndRole(collegeId, role);
+			Pageable pageable = pageSize > 0 ? PageRequest.of(pageNo, pageSize) : Pageable.unpaged();
 
-		if (findByCollegeIdAndRole != null && !findByCollegeIdAndRole.isEmpty()) {
-			userDtos = findByCollegeIdAndRole.stream().map(user -> UserDto.convertEntityToDto(user))
-					.collect(Collectors.toList());
+			Page<User> findByCollegeIdAndRole = userRepository.findAll(paginatedRequest, pageable);
+
+			List<User> users = findByCollegeIdAndRole.getContent();
+
+			List<UserDto> userDtos = new ArrayList<>();
+			if (users != null && !users.isEmpty()) {
+				List<Integer> batches = users.stream().map(User::getBatch).collect(Collectors.toList());
+				List<CollegeWiseBatch> findByIdIn = collegeWiseBatchRepository.findByIdIn(batches);
+
+				Map<Integer, CollegeWiseBatch> batchMap = findByIdIn.stream()
+						.collect(Collectors.toMap(CollegeWiseBatch::getId, batch -> batch));
+
+				userDtos = users.stream().map(user -> {
+					UserDto userDto = UserDto.convertEntityToDto(user);
+
+					CollegeWiseBatch batch = batchMap.get(user.getBatch());
+
+					if (batch != null) {
+						CollegeWiseBatchDto batchDto = CollegeWiseBatchDto.fromEntity(batch);
+						userDto.setBatchDto(batchDto);
+
+					}
+
+					return userDto;
+				}).collect(Collectors.toList());
+			}
+
+			PaginatedResponseDto<Object> paginatedResponseDto = new PaginatedResponseDto<>(
+					userRepository.countUserByRoleAndIsActiveTrueWhereCollegeId(collegeId, role), userDtos.size(),
+					findByCollegeIdAndRole.getTotalPages(), pageNo, userDtos);
+
+			return new Response<>("Success", paginatedResponseDto, HttpStatus.OK.value());
+		} catch (Exception e) {
+
+			return new Response<>("Something Went wrong", null, HttpStatus.BAD_REQUEST.value());
 
 		}
-
-		return new Response<>("Success", userDtos, HttpStatus.OK.value());
 	}
 
 }

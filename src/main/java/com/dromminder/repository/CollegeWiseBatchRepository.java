@@ -12,9 +12,13 @@ import com.dromminder.model.CollegeWiseBatch;
 @Repository
 public interface CollegeWiseBatchRepository extends JpaRepository<CollegeWiseBatch, Integer> {
 
-	@Query(value = "SELECT * FROM college_wise_batchh WHERE college_id = :collegeId", nativeQuery = true)
+	@Query(value = "SELECT * FROM college_wise_batch WHERE college_id = :collegeId", nativeQuery = true)
 	List<CollegeWiseBatch> findAllByCollegeId(@Param("collegeId") Integer collegeId);
 
 	@Query(value = "SELECT * FROM college_wise_batch WHERE college_id = :collegeId AND name = :name", nativeQuery = true)
 	CollegeWiseBatch findByCollegeIdAndName(@Param("collegeId") Integer collegeId, @Param("name") String name);
+
+	@Query(value = "SELECT * FROM college_wise_batch WHERE id IN (:batches)", nativeQuery = true)
+	List<CollegeWiseBatch> findByIdIn(@Param("batches") List<Integer> batches);
+
 }

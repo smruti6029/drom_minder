@@ -66,6 +66,9 @@ public class User {
 	@Column(name = "roll_number")
 	private String rollNumber;
 	
+	@Column(name ="image_url")
+	private String imageUrl;
+	
 
 	public Long getId() {
 		return id;
@@ -179,6 +182,14 @@ public class User {
 
 	public void setRollNumber(String rollNumber) {
 		this.rollNumber = rollNumber;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
 	}
 
 	public User(Long id, String name, String email, String phone, Date createdOn, Date updatedOn, Boolean isActive) {

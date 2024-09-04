@@ -37,13 +37,6 @@ public class UserController {
 
 	}
 
-	@GetMapping(value = "/search", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<?> getAllUser(@RequestParam("userName") String userName) {
-		Response<?> customResponse = userService.searchByName(userName);
-		return new ResponseEntity<>(customResponse, HttpStatus.valueOf(customResponse.getResponseCode()));
-
-	}
-
 	@GetMapping("/getByid")
 	public ResponseEntity<?> getUserById(@RequestParam("userId") Long userId) {
 		Response<?> customResponse = userService.getById(userId);
@@ -52,9 +45,10 @@ public class UserController {
 	}
 
 	@GetMapping("/getall")
-	public ResponseEntity<?> getUserById(@RequestParam("collegeId") Integer collegeId,
-			@RequestParam(value = "role", required = false) String role) {
-		Response<?> customResponse = userService.getAllUser(collegeId, role);
+	public ResponseEntity<?> getUserById(@RequestParam(required = false, defaultValue = "0") int pageSize,
+			@RequestParam(required = false, defaultValue = "0") int pageNo,
+			@RequestParam("collegeId") Integer collegeId, @RequestParam(value = "role", required = false) String role) {
+		Response<?> customResponse = userService.getAllUser(pageNo,pageSize,collegeId, role);
 		return new ResponseEntity<>(customResponse, HttpStatus.valueOf(customResponse.getResponseCode()));
 
 	}

@@ -13,6 +13,7 @@ public class CollegeWiseBatchDto {
 	private String name;
 	private Date createdOn;
 	private Date updatedOn;
+	private Boolean isActive;
 
 	public CollegeWiseBatchDto() {
 	}
@@ -56,17 +57,28 @@ public class CollegeWiseBatchDto {
 	public void setUpdatedOn(Date updatedOn) {
 		this.updatedOn = updatedOn;
 	}
+	
+	
 
-	public CollegeWiseBatchDto(Integer id, Integer collegeId, String name, Date createdOn, Date updatedOn) {
+	public Boolean getIsActive() {
+		return isActive;
+	}
+
+	public void setIsActive(Boolean isActive) {
+		this.isActive = isActive;
+	}
+
+	public CollegeWiseBatchDto(Integer id, Integer collegeId, String name, Date createdOn, Date updatedOn,Boolean isACtive) {
 		this.id = id;
 		this.collegeId = collegeId;
 		this.name = name;
 		this.createdOn = createdOn;
 		this.updatedOn = updatedOn;
+		this.isActive=isACtive;
 	}
 	public static CollegeWiseBatchDto fromEntity(CollegeWiseBatch entity) {
 		return new CollegeWiseBatchDto(entity.getId(), entity.getCollegeId(), entity.getName(), entity.getCreatedOn(),
-				entity.getUpdatedOn());
+				entity.getUpdatedOn(),entity.getIsActive());
 	}
 
 }

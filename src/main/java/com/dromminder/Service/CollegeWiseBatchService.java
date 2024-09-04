@@ -9,4 +9,6 @@ public interface CollegeWiseBatchService {
 
 	Response<?> getAllByCollegeId(Integer collegeId);
 
+	Response<?> updateCollegeWiseBatch(CollegeWiseBatch collegeWiseBatch);
+
 }
